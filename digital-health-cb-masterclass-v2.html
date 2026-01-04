@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Health Competency Framework | Masterclass</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        },
+                        dark: {
+                            900: '#0f172a',
+                            800: '#1e293b',
+                            700: '#334155',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'slid-up': 'slideUp 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- React Dependencies -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide-react@latest"></script>
+
+    <style>
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .glass-dark {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .mesh-gradient {
+            background-color: #0f172a;
+            background-image:
+                radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Icon wrapper
+        const Icon = ({ name, className }) => {
+            const lucideIcons = window.lucide?.icons;
+            if (!lucideIcons) return null;
+
+            // Map common names if needed, or use direct lookup
+            const IconComponent = lucideIcons[name];
+
+            if (IconComponent) {
+                // We need to render the SVG string into a component or use createElements
+                // Since we are in browser-babel-land, simpler to use the lucide.createIcons approach 
+                // BUT for React components, we need the specific react library or map it manually.
+                // For simplicity in this CDN environment without specific lucide-react, 
+                // we will use a workaround or SVG paths if available, or rely on lucide global to replace <i>.
+                // However, the cleanest way in this specific setup is to just mapping names to SVGs if we can,
+                // OR use the previously successful method:
+                // previous file used: const { BookOpen } = icons;
+
+                const LucideReact = window.LucideReact;
+                if (LucideReact && LucideReact[name]) {
+                    const Component = LucideReact[name];
+                    return <Component className={className} />;
+                }
+            }
+            return <div className={className} />;
+        };
+
+        // Safer icon mapping
+        // Robust Icon mapping with fallbacks
+        const Icons = window.lucideReact || window.LucideReact || window.Lucide || {};
+
+        // Helper to get icon or fallback
+        const getIcon = (name) => Icons[name] || (() => null);
+
+        const BookOpen = getIcon('BookOpen');
+        const Users = getIcon('Users');
+        const Target = getIcon('Target');
+        const ChevronRight = getIcon('ChevronRight');
+        const GraduationCap = getIcon('GraduationCap');
+        const ArrowRight = getIcon('ArrowRight');
+        const Layout = getIcon('Layout');
+        const Activity = getIcon('Activity');
+        const ShieldCheck = getIcon('ShieldCheck');
+        const Database = getIcon('Database');
+        const Stethoscope = getIcon('Stethoscope');
+        const BarChart3 = getIcon('BarChart3');
+        const Globe = getIcon('Globe');
+        const Lightbulb = getIcon('Lightbulb');
+        const UserCheck = getIcon('UserCheck');
+        const Layers = getIcon('Layers');
+        const Sparkles = getIcon('Sparkles');
+        const Zap = getIcon('Zap');
+        const CheckCircle2 = getIcon('CheckCircle2');
+        const Clock = getIcon('Clock');
+
+        const App = () => {
+            const [selectedTier, setSelectedTier] = useState(0);
+            const [mounted, setMounted] = useState(false);
+
+            useEffect(() => {
+                setMounted(true);
+            }, []);
+
+            const data = [
+                {
+                    id: "tier1",
+                    level: "Foundational Digital Health Literacy",
+                    shortTitle: "Foundational",
+                    color: "blue",
+                    accent: "from-blue-500 to-cyan-400",
+                    bgLight: "bg-blue-50",
+                    textAccent: "text-blue-600",
+                    icon: BookOpen,
+                    stats: "3 Courses",
+                    objective: "To equip the entire health workforce with the core skills and understanding needed to participate safely, ethically, and effectively in a digitally-enabled healthcare environment.",
+                    profile: "All individuals who deliver or assist in the delivery of health services, including clinicians, administrators, community health workers, and support staff.",
+                    courses: [
+                        {
+                            id: "c1",
+                            title: "1. Being a HCP in a Digital World",
+                            icon: Globe,
+                            tags: ["Ethics", "Communication", "Telehealth"],
+                            description: "This course explores the domains of Digital Professionalism & Ethics, Digital Tools & Systems, and Digital Communication. Participants will learn to adhere to digital legislation and ethics, manage their online professional footprint, and utilize communication technologies like telehealth. It also covers the fundamentals of Information & Data Use to support decision-making and introduces concepts in Clinical & Process Improvement and Enterprise Systems."
+                        },
+                        {
+                            id: "c2",
+                            title: "2. Responsible Digital Transformation",
+                            icon: ShieldCheck,
+                            tags: ["Governance", "Security", "Policy"],
+                            description: "Focusing on Strategic Governance & Policy and Clinical & Process Improvement, this course guides learners in interpreting legislative obligations and data governance. It covers Digital Professionalism & Ethics and Enterprise Systems & Interoperability, enabling participants to advocate for digital innovation, apply system security practices, and support ethical information governance."
+                        },
+                        {
+                            id: "c3",
+                            title: "3. EMR’s and the Surrounding Ecosystem",
+                            icon: Database,
+                            tags: ["EHRs", "Data Use", "Systems"],
+                            description: "This course centers on Digital Tools & Systems and Information & Data Use. It equips learners to confidently use devices and Electronic Health Records (EHRs) for safe, consumer-centric service delivery. It also touches upon Enterprise Systems & Interoperability to help staff differentiate architecture components and support data-driven decision-making."
+                        }
+                    ]
+                },
+                {
+                    id: "tier2",
+                    level: "Applied Digital Health Practice",
+                    shortTitle: "Applied Practice",
+                    color: "emerald",
+                    accent: "from-emerald-500 to-teal-400",
+                    bgLight: "bg-emerald-50",
+                    textAccent: "text-emerald-600",
+                    icon: Activity,
+                    stats: "5 Courses",
+                    objective: "To enable health professionals and managers to optimize clinical and administrative processes, lead local digital health initiatives, and use data for service improvement.",
+                    profile: "Health professionals in supervisory roles, clinic and service managers, project leads, and health program managers.",
+                    courses: [
+                        {
+                            id: "c4",
+                            title: "4. Digital Medicine and Digital Therapeutics",
+                            icon: Stethoscope,
+                            tags: ["Innovation", "Therapeutics"],
+                            description: "This course applies concepts from Digital Tools & Systems and Innovation & Health Economics. It focuses on recognizing and using the right technologies for patient needs and appraising new data sources and emerging technologies relevant to modern health practice."
+                        },
+                        {
+                            id: "c5",
+                            title: "5. Augmented Intelligence in Healthcare",
+                            icon: Lightbulb,
+                            tags: ["AI", "Future Tech"],
+                            description: "By integrating Digital Tools & Systems with Innovation & Health Economics, this course prepares professionals to appraise emerging AI technologies. Participants will learn to confidently use advanced applications and recognize appropriate technology to deliver safe, consumer-centric services."
+                        },
+                        {
+                            id: "c6",
+                            title: "6. Data and IT Standards for Clinicians",
+                            icon: Layout,
+                            tags: ["Interoperability", "Standards"],
+                            description: "Centered on Information & Data Use and Enterprise Systems & Interoperability, this course emphasizes the importance of data integrity, capture, and standard terminology. It also covers Data Analytics & Governance, ensuring learners can appraise relevant standards for safe system interfacing and interoperability."
+                        },
+                        {
+                            id: "c10",
+                            title: "10. Digital Health Project & Change Management",
+                            icon: Users,
+                            tags: ["Leadership", "Strategy"],
+                            description: "This course focuses on Project & Change Management and Clinical & Process Improvement. It provides methodologies for effective program management and change leadership, while developing strategies for stakeholder engagement and business process re-engineering."
+                        },
+                        {
+                            id: "c11",
+                            title: "11. Health Data Analytics & Visualization",
+                            icon: BarChart3,
+                            tags: ["Analytics", "Visualization"],
+                            description: "Dedicated to Data Analytics & Governance, this course teaches the employment of descriptive and inferential statistics. Learners will identify effective visualization methods to facilitate knowledge discovery and data-driven insights."
+                        }
+                    ]
+                },
+                {
+                    id: "tier3",
+                    level: "Strategic Health Informatics Leadership",
+                    shortTitle: "Strategic Leadership",
+                    color: "purple",
+                    accent: "from-violet-500 to-purple-400",
+                    bgLight: "bg-purple-50",
+                    textAccent: "text-purple-600",
+                    icon: Target,
+                    stats: "4 Courses",
+                    objective: "To guide the design, strategy, and transformation of the broader health ecosystem through the application of deep and specialized health informatics knowledge.",
+                    profile: "Health informaticians, Chief Information/Innovation Officers, digital health strategists, researchers, and senior policymakers.",
+                    courses: [
+                        {
+                            id: "c7",
+                            title: "7. Patient and Consumer Empowerment",
+                            icon: UserCheck,
+                            tags: ["Patient-Centric", "Access"],
+                            description: "This course highlights Patient-Centered Digital Services and Digital Communication & Collaboration. It advocates for patient access to health data and determines best practices for integrating health literacy into systems, utilizing tools that facilitate person-centered management."
+                        },
+                        {
+                            id: "c8",
+                            title: "8. Usability and UX in Digital Health",
+                            icon: Layers,
+                            tags: ["Design", "HCD"],
+                            description: "Focusing on Patient-Centered Digital Services, this course determines best practices in human-centered design (HCD), usability, and human factors to optimize digital health tools for user experience."
+                        },
+                        {
+                            id: "c9",
+                            title: "9. Value-Based Digital Health",
+                            icon: BarChart3,
+                            tags: ["Economics", "ROI"],
+                            description: "This course integrates Innovation & Health Economics, Strategic Governance & Policy, and Health Informatics Science & Theory. It focuses on determining the economic impact of digital initiatives, aligning systems with business goals, and selecting value management strategies to ensure successful outcomes."
+                        },
+                        {
+                            id: "c12",
+                            title: "12. Advanced Health Informatics Science",
+                            icon: GraduationCap,
+                            tags: ["Theory", "Research"],
+                            description: "Deepening knowledge in Health Informatics Science & Theory, this course applies theoretical frameworks to practice. It involves appraising the structure and design of health information across different contexts and relating the history of informatics to future health environments."
+                        }
+                    ]
+                }
+            ];
+
+            const activeTier = data[selectedTier];
+
+            if (!mounted) return <div className="min-h-screen flex items-center justify-center bg-slate-900 text-slate-400">Initializing Experience...</div>;
+
+            return (
+                <div className="min-h-screen bg-slate-50 font-sans selection:bg-blue-100 selection:text-blue-900">
+
+                    {/* Immersive Header */}
+                    <div className="relative bg-slate-900 text-white overflow-hidden pb-12 lg:pb-20">
+                        <div className="absolute inset-0 mesh-gradient opacity-90"></div>
+                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
+
+                        {/* Decorative blobs */}
+                        <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-blue-600/30 rounded-full blur-[100px] pointer-events-none"></div>
+                        <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[100px] pointer-events-none"></div>
+
+                        <div className="relative max-w-7xl mx-auto px-6 pt-16 lg:pt-24">
+                            <div className="text-center max-w-4xl mx-auto mb-16">
+                                <h1 className="text-4xl md:text-6xl font-display font-bold leading-tight mb-8 tracking-tight">
+                                    Digital Health <br />
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400">
+                                        Competency Masterclass
+                                    </span>
+                                </h1>
+                                <p className="text-lg text-slate-300 md:text-xl leading-relaxed max-w-2xl mx-auto font-light">
+                                    A strategic framework designed to elevate healthcare professionals from foundational literacy to transformative leadership.
+                                </p>
+                            </div>
+
+                            {/* Navigation Tabs */}
+                            <div className="flex flex-wrap justify-center gap-4 pb-2">
+                                {data.map((tier, idx) => {
+                                    const isActive = selectedTier === idx;
+                                    const TierIcon = tier.icon;
+                                    return (
+                                        <button
+                                            key={tier.id}
+                                            onClick={() => setSelectedTier(idx)}
+                                            className={`
+                                                group relative flex-shrink-0 flex items-center gap-4 p-5 pr-8 rounded-2xl border transition-all duration-300 min-w-[280px]
+                                                ${isActive
+                                                    ? 'bg-white/10 border-white/20 shadow-2xl backdrop-blur-xl'
+                                                    : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10 text-slate-400'}
+                                            `}
+                                        >
+                                            <div className={`
+                                                w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg transition-transform duration-500 group-hover:scale-110
+                                                ${isActive ? `bg-gradient-to-br ${tier.accent}` : 'bg-slate-800'}
+                                            `}>
+                                                <TierIcon className="w-6 h-6" />
+                                            </div>
+                                            <div className="text-left">
+                                                <p className={`text-xs font-bold uppercase tracking-wider mb-1 ${isActive ? 'text-white' : 'text-slate-500'}`}>
+                                                    Tier {idx + 1}
+                                                </p>
+                                                <h3 className={`font-semibold text-lg ${isActive ? 'text-white' : 'text-slate-300'}`}>
+                                                    {tier.shortTitle}
+                                                </h3>
+                                            </div>
+                                            {isActive && (
+                                                <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-white/50 to-transparent opacity-50"></div>
+                                            )}
+                                        </button>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Main Content Area */}
+                    <main className="max-w-7xl mx-auto px-6 py-12 lg:py-16">
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+
+                            {/* Sticky Sidebar Info */}
+                            <div className="lg:col-span-4 space-y-8 h-fit lg:sticky lg:top-8 animate-slid-up" key={selectedTier}>
+                                <div>
+                                    <h2 className="font-display text-3xl font-bold text-slate-900 mb-2">
+                                        {activeTier.level}
+                                    </h2>
+                                    <div className="h-1 w-20 rounded-full bg-gradient-to-r from-blue-500 to-emerald-400 mb-6"></div>
+
+                                    <div className="space-y-6">
+                                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/60 hover:shadow-md transition-shadow">
+                                            <div className="flex items-center gap-3 mb-3 text-slate-900 font-semibold">
+                                                <Target className={`w-5 h-5 ${activeTier.textAccent}`} />
+                                                <span>Objective</span>
+                                            </div>
+                                            <p className="text-slate-600 leading-relaxed">
+                                                {activeTier.objective}
+                                            </p>
+                                        </div>
+
+                                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/60 hover:shadow-md transition-shadow">
+                                            <div className="flex items-center gap-3 mb-3 text-slate-900 font-semibold">
+                                                <Users className={`w-5 h-5 ${activeTier.textAccent}`} />
+                                                <span>Target Profile</span>
+                                            </div>
+                                            <p className="text-slate-600 leading-relaxed">
+                                                {activeTier.profile}
+                                            </p>
+                                        </div>
+
+                                        <div className={`p-6 rounded-2xl bg-gradient-to-br ${activeTier.accent} text-white shadow-lg transform hover:-translate-y-1 transition-transform`}>
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className="text-white/80 text-sm font-medium uppercase tracking-wide">Included</span>
+                                                <GraduationCap className="w-5 h-5 text-white/90" />
+                                            </div>
+                                            <div className="text-3xl font-bold font-display">{activeTier.stats}</div>
+                                            <div className="mt-2 text-sm text-white/80">Certification upon completion</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Course Grid */}
+                            <div className="lg:col-span-8">
+                                <div className="flex items-center justify-between mb-8">
+                                    <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                                        <Layout className="w-5 h-5 text-slate-400" />
+                                        Curriculum Modules
+                                    </h3>
+                                    <span className="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
+                                        {activeTier.courses.length} Courses
+                                    </span>
+                                </div>
+
+                                <div className="grid grid-cols-1 gap-6">
+                                    {activeTier.courses.map((course, idx) => {
+                                        const CourseIcon = course.icon;
+                                        return (
+                                            <div
+                                                key={course.id}
+                                                className="group bg-white rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-300 relative overflow-hidden"
+                                                style={{ animationDelay: `${idx * 100}ms` }}
+                                            >
+                                                {/* Hover Gradient Effect */}
+                                                <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${activeTier.accent} opacity-0 group-hover:opacity-5 transition-opacity duration-300 rounded-bl-full pointer-events-none`}></div>
+
+                                                <div className="flex flex-col md:flex-row gap-6 md:items-start">
+                                                    <div className={`
+                                                        w-14 h-14 rounded-2xl flex-shrink-0 flex items-center justify-center text-white shadow-lg
+                                                        bg-gradient-to-br ${activeTier.accent} 
+                                                        transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500
+                                                    `}>
+                                                        <CourseIcon className="w-7 h-7" />
+                                                    </div>
+
+                                                    <div className="flex-1">
+                                                        <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-2 mb-3">
+                                                            <h4 className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                                                                {course.title}
+                                                            </h4>
+                                                            <div className="flex gap-2 flex-wrap">
+                                                                {course.tags.map(tag => (
+                                                                    <span key={tag} className="text-[10px] uppercase tracking-wider font-bold text-slate-500 bg-slate-50 border border-slate-200 px-2 py-1 rounded-md">
+                                                                        {tag}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+
+                                                        <p className="text-slate-600 leading-relaxed mb-6">
+                                                            {course.description}
+                                                        </p>
+
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+
+
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>
