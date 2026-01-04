@@ -77,22 +77,30 @@
             background: transparent; 
         }
         ::-webkit-scrollbar-thumb {
-            background: #cbd5e1; 
+            background: #334155; 
             border-radius: 3px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; 
+            background: #475569; 
         }
         
         body {
-            background-color: #f8fafc;
+            background-color: #020617; /* Dark Blue / Slate 950 */
             background-image: 
-                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.03) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.03) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.08) 0px, transparent 50%);
+        }
+
+        .mobile-menu-enter {
+            transform: translateX(-100%);
+        }
+        .mobile-menu-enter-active {
+            transform: translateX(0);
+            transition: transform 0.3s ease-out;
         }
     </style>
 </head>
-<body class="text-slate-900 antialiased min-h-screen flex flex-col">
+<body class="text-slate-100 antialiased min-h-screen flex flex-col">
     <div id="root" class="flex-grow"></div>
 
     <script type="text/babel">
@@ -118,6 +126,21 @@
         );
 
         // --- Icon Definitions ---
+        const Menu = (props) => (
+            <IconBase {...props}>
+                <line x1="4" x2="20" y1="12" y2="12" />
+                <line x1="4" x2="20" y1="6" y2="6" />
+                <line x1="4" x2="20" y1="18" y2="18" />
+            </IconBase>
+        );
+
+        const X = (props) => (
+            <IconBase {...props}>
+                <path d="M18 6 6 18" />
+                <path d="m6 6 12 12" />
+            </IconBase>
+        );
+
         const BookOpen = (props) => (
             <IconBase {...props}>
                 <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
@@ -166,7 +189,7 @@
             <IconBase {...props}>
                 <circle cx="12" cy="12" r="10" />
                 <line x1="2" x2="22" y1="12" y2="12" />
-                <path d="a15.3 15.3 0 0 1 4-10 15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z" />
+                <path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
             </IconBase>
         );
 
@@ -228,7 +251,7 @@
             </IconBase>
         );
 
-        // --- Data Structure derived from provided CSV snippets ---
+        // --- Data Structure ---
         const frameworkData = [
             {
                 tier: 1,
@@ -236,9 +259,9 @@
                 subtitle: "Digital Health Essentials",
                 color: "bg-emerald-500",
                 gradient: "from-emerald-500 to-teal-400",
-                lightColor: "bg-emerald-50",
-                borderColor: "border-emerald-200",
-                textColor: "text-emerald-700",
+                lightColor: "bg-emerald-500/10",
+                borderColor: "border-emerald-500/30",
+                textColor: "text-emerald-400",
                 icon: <User className="w-6 h-6" />,
                 focus: "To equip the entire health workforce with the core skills and understanding needed to participate safely, ethically, and effectively in a digitally-enabled healthcare environment.",
                 audience: "All individuals who deliver or assist in the delivery of health services, including clinicians, administrators, community health workers, and support staff.",
@@ -249,7 +272,7 @@
                     icon: <Shield className="w-5 h-5" />,
                     components: [
                     { id: "A1", desc: "Understands and adheres to relevant legislation, professional codes of conduct, policy, and ethics, including data privacy and security requirements." },
-                    { id: "A2", desc: "Understands the benefits and risks of a digital presence and manages one's online footprint to maintain professional and public trust." },
+                    { id: "A2", desc: "Understands the benefits and risks of a digital presence and manages one\'s online footprint to maintain professional and public trust." },
                     { id: "A3", desc: "Employs digital technologies in personal and professional learning and maintains currency with tools and innovations in digital health." }
                     ]
                 },
@@ -281,13 +304,12 @@
                 subtitle: "Driving Digital Change",
                 color: "bg-blue-500",
                 gradient: "from-blue-500 to-indigo-500",
-                lightColor: "bg-blue-50",
-                borderColor: "border-blue-200",
-                textColor: "text-blue-700",
+                lightColor: "bg-blue-500/10",
+                borderColor: "border-blue-500/30",
+                textColor: "text-blue-400",
                 icon: <Users className="w-6 h-6" />,
                 focus: "Leading digital transformation and managing health information systems at a departmental or organizational level.",
                 audience: "Health managers, project leads, clinical leaders, and digital health champions.",
-                isPlaceholder: true, 
                 domains: [
                 {
                     id: "D",
@@ -314,9 +336,9 @@
                 subtitle: "Shaping the Future",
                 color: "bg-purple-600",
                 gradient: "from-purple-600 to-fuchsia-600",
-                lightColor: "bg-purple-50",
-                borderColor: "border-purple-200",
-                textColor: "text-purple-800",
+                lightColor: "bg-purple-600/10",
+                borderColor: "border-purple-600/30",
+                textColor: "text-purple-400",
                 icon: <Layers className="w-6 h-6" />,
                 focus: "Developing strategy, governance, and innovation frameworks for the health ecosystem.",
                 audience: "Executives, CIOs, CNIOs, Policy Makers, and Senior Digital Health Specialists.",
@@ -369,37 +391,86 @@
             const [activeTier, setActiveTier] = useState(frameworkData[0]);
             const [activeDomain, setActiveDomain] = useState(frameworkData[0].domains[0]);
             const [searchQuery, setSearchQuery] = useState("");
+            const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
             const handleTierClick = (tier) => {
                 setActiveTier(tier);
                 setActiveDomain(tier.domains[0]);
+                setIsMobileMenuOpen(false);
             };
 
+            const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+
             return (
-                <div className="min-h-screen font-sans selection:bg-brand-100 selection:text-brand-700 pb-20">
+                <div className="min-h-screen font-sans selection:bg-blue-500/30 selection:text-blue-200 pb-20">
                     
-                    {/* Modern Glassy Header */}
-                    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm transition-all duration-300">
+                    {/* Dark Modern Header */}
+                    <header className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-lg border-b border-slate-800 shadow-xl transition-all duration-300">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="bg-gradient-to-br from-blue-600 to-indigo-600 p-2 rounded-xl text-white shadow-lg shadow-blue-500/30">
+                                <div className="bg-gradient-to-br from-blue-600 to-indigo-600 p-2 rounded-xl text-white shadow-lg shadow-blue-500/20">
                                     <Activity className="w-6 h-6" />
                                 </div>
                                 <div>
-                                    <h1 className="text-xl font-display font-bold text-slate-900 leading-none tracking-tight">Digital Health</h1>
-                                    <p className="text-xs text-slate-500 font-medium tracking-wide mt-0.5">Competency Framework Explorer</p>
+                                    <h1 className="text-xl font-display font-bold text-white leading-none tracking-tight">Digital Health</h1>
+                                    <p className="text-xs text-slate-400 font-medium tracking-wide mt-0.5 uppercase">Framework Explorer</p>
                                 </div>
                             </div>
                             
-                            <div className="relative hidden md:block group">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                                <input 
-                                    type="text" 
-                                    placeholder="Find competencies..." 
-                                    className="pl-10 pr-4 py-2.5 bg-slate-100/80 border border-transparent rounded-full text-sm font-medium focus:bg-white focus:border-blue-300 focus:ring-4 focus:ring-blue-100 w-72 transition-all outline-none placeholder:text-slate-400"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                />
+                            <div className="flex items-center gap-4">
+                                <div className="relative hidden md:block group">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
+                                    <input 
+                                        type="text" 
+                                        placeholder="Find competencies..." 
+                                        className="pl-10 pr-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-full text-sm font-medium focus:bg-slate-800 focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 w-64 lg:w-80 transition-all outline-none placeholder:text-slate-500 text-white"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                    />
+                                </div>
+
+                                {/* Hamburger Menu Button */}
+                                <button 
+                                    onClick={toggleMobileMenu}
+                                    className="md:hidden p-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white transition-colors border border-slate-700"
+                                    aria-label="Toggle menu"
+                                >
+                                    {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Mobile Navigation Dropdown */}
+                        <div className={`
+                            md:hidden absolute top-20 left-0 w-full bg-slate-900 border-b border-slate-800 overflow-hidden transition-all duration-300 ease-in-out
+                            ${isMobileMenuOpen ? \'max-h-[80vh] opacity-100\' : \'max-h-0 opacity-0 pointer-events-none\'}
+                        `}>
+                            <div className="p-6 space-y-6">
+                                <div>
+                                    <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Select Tier</h3>
+                                    <div className="grid grid-cols-1 gap-3">
+                                        {frameworkData.map((tier) => (
+                                            <button
+                                                key={tier.tier}
+                                                onClick={() => handleTierClick(tier)}
+                                                className={`
+                                                    flex items-center gap-4 p-4 rounded-xl border transition-all
+                                                    ${activeTier.tier === tier.tier 
+                                                        ? `bg-slate-800 ${tier.borderColor} ring-1 ring-blue-500/20` 
+                                                        : \'bg-slate-800/40 border-slate-700/50\'}
+                                                `}
+                                            >
+                                                <div className={`p-2 rounded-lg ${activeTier.tier === tier.tier ? `bg-gradient-to-br ${tier.gradient} text-white` : \'bg-slate-700 text-slate-400\'}`}>
+                                                    {tier.icon}
+                                                </div>
+                                                <div className="text-left">
+                                                    <div className="text-sm font-bold text-white">Tier {tier.tier}</div>
+                                                    <div className="text-xs text-slate-400">{tier.title}</div>
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </header>
@@ -408,16 +479,16 @@
                         
                         {/* Hero Section */}
                         <div className="mb-12 max-w-4xl">
-                            <h2 className="text-4xl md:text-5xl font-display font-bold text-slate-900 mb-6 tracking-tight leading-tight">
-                                Explore the <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-violet-600">Competency Tiers</span>
+                            <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-6 tracking-tight leading-tight">
+                                Explore the <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Competency Tiers</span>
                             </h2>
-                            <p className="text-lg text-slate-600 leading-relaxed max-w-2xl">
-                                A comprehensive guide defining the essential skills, knowledge, and capabilities required for the modern digital health workforce across three distinct levels of practice.
+                            <p className="text-lg text-slate-400 leading-relaxed max-w-2xl">
+                                A comprehensive guide defining the essential skills, knowledge, and capabilities required for the modern digital health workforce.
                             </p>
                         </div>
 
-                        {/* Tier Navigation Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                        {/* Tier Navigation (Desktop Only) */}
+                        <div className="hidden md:grid grid-cols-3 gap-6 mb-12">
                             {frameworkData.map((tier) => {
                                 const isActive = activeTier.tier === tier.tier;
                                 return (
@@ -428,46 +499,35 @@
                                             relative overflow-hidden rounded-2xl p-6 text-left transition-all duration-300
                                             group border
                                             ${isActive 
-                                                ? 'bg-white border-transparent shadow-xl scale-[1.02] ring-2 ring-offset-2 ring-offset-slate-50' 
-                                                : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-lg hover:-translate-y-1 shadow-sm'
+                                                ? `bg-slate-800/50 ${tier.borderColor} shadow-2xl shadow-blue-500/10 scale-[1.02] ring-1 ring-blue-500/20` 
+                                                : \'bg-slate-900/40 border-slate-800 hover:border-slate-700 hover:bg-slate-800/30 hover:-translate-y-1 shadow-sm\'
                                             }
-                                            ${isActive ? `ring-${tier.color.split('-')[1]}-500` : ''}
                                         `}
                                     >
-                                        {/* Gradient Background for Active State */}
-                                        {isActive && (
-                                            <div className={`absolute inset-0 opacity-5 bg-gradient-to-br ${tier.gradient}`} />
-                                        )}
-                                        
                                         <div className="relative z-10 flex flex-col h-full">
                                             <div className="flex items-center justify-between mb-6">
                                                 <span className={`
-                                                    text-xs font-bold tracking-widest uppercase px-2 py-1 rounded-md
-                                                    ${isActive ? `bg-gradient-to-r ${tier.gradient} text-white shadow-md` : 'bg-slate-100 text-slate-500'}
+                                                    text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-md
+                                                    ${isActive ? `bg-gradient-to-r ${tier.gradient} text-white` : \'bg-slate-800 text-slate-500\'}
                                                 `}>
                                                     Tier {tier.tier}
                                                 </span>
                                                 <div className={`
-                                                    p-2.5 rounded-xl transition-colors
-                                                    ${isActive ? `bg-gradient-to-br ${tier.gradient} text-white shadow-lg` : 'bg-slate-50 text-slate-400 group-hover:bg-slate-100 group-hover:text-slate-600'}
+                                                    p-2.5 rounded-xl transition-all duration-300
+                                                    ${isActive ? `bg-gradient-to-br ${tier.gradient} text-white shadow-lg` : \'bg-slate-800 text-slate-600 group-hover:text-slate-400\'}
                                                 `}>
                                                     {tier.icon}
                                                 </div>
                                             </div>
                                             
                                             <div className="mt-auto">
-                                                <h3 className={`text-xl font-display font-bold mb-1 ${isActive ? 'text-slate-900' : 'text-slate-700'}`}>
+                                                <h3 className={`text-xl font-display font-bold mb-1 transition-colors ${isActive ? \'text-white\' : \'text-slate-400\'}`}>
                                                     {tier.title}
                                                 </h3>
-                                                <p className={`text-sm font-medium ${isActive ? tier.textColor : 'text-slate-400'}`}>
+                                                <p className={`text-sm font-medium ${isActive ? tier.textColor : \'text-slate-600\'}`}>
                                                     {tier.subtitle}
                                                 </p>
                                             </div>
-
-                                            {/* Decorative Indicator */}
-                                            {isActive && (
-                                                <div className={`absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r ${tier.gradient}`} />
-                                            )}
                                         </div>
                                     </button>
                                 );
@@ -477,45 +537,50 @@
                         {/* Main Content Layout */}
                         <div className="flex flex-col lg:flex-row gap-8 animate-slide-up">
                             
-                            {/* Left: Sidebar (Context & Domains) */}
+                            {/* Left: Sidebar */}
                             <div className="w-full lg:w-1/3 space-y-6">
                                 {/* Context Card */}
-                                <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-soft">
+                                <div className="bg-slate-900/60 rounded-2xl border border-slate-800 p-6 shadow-xl backdrop-blur-sm">
                                     <div className="mb-6">
-                                        <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
+                                        <h4 className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3">
                                             <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
                                             Tier Focus
                                         </h4>
-                                        <p className="text-sm text-slate-700 font-medium leading-relaxed">{activeTier.focus}</p>
+                                        <p className="text-sm text-slate-300 font-medium leading-relaxed">{activeTier.focus}</p>
                                     </div>
-                                    <div className="pt-6 border-t border-slate-100">
-                                        <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
+                                    <div className="pt-6 border-t border-slate-800">
+                                        <h4 className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3">
                                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                             Target Audience
                                         </h4>
-                                        <p className="text-sm text-slate-700 font-medium leading-relaxed">{activeTier.audience}</p>
+                                        <p className="text-sm text-slate-300 font-medium leading-relaxed">{activeTier.audience}</p>
                                     </div>
                                 </div>
 
                                 {/* Domain Navigation List */}
-                                <div className="bg-white rounded-2xl border border-slate-200 shadow-soft overflow-hidden">
-                                    <div className="px-6 py-4 bg-slate-50/50 border-b border-slate-200 flex justify-between items-center backdrop-blur-sm">
-                                        <h3 className="font-display font-bold text-slate-800">Domains</h3>
-                                        <span className="text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full uppercase tracking-wide">
+                                <div className="bg-slate-900/60 rounded-2xl border border-slate-800 shadow-xl overflow-hidden backdrop-blur-sm">
+                                    <div className="px-6 py-4 bg-slate-800/40 border-b border-slate-800 flex justify-between items-center">
+                                        <h3 className="font-display font-bold text-white text-sm">Domains</h3>
+                                        <span className="text-[9px] font-bold bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full uppercase tracking-widest">
                                             {activeTier.domains.length} Areas
                                         </span>
                                     </div>
-                                    <div className="divide-y divide-slate-50">
+                                    <div className="divide-y divide-slate-800/50">
                                         {activeTier.domains.map((domain) => {
                                             const isDomainActive = activeDomain.id === domain.id;
                                             return (
                                                 <button
                                                     key={domain.id}
-                                                    onClick={() => setActiveDomain(domain)}
+                                                    onClick={() => {
+                                                        setActiveDomain(domain);
+                                                        if (window.innerWidth < 1024) {
+                                                            document.getElementById(\'content-area\').scrollIntoView({ behavior: \'smooth\' });
+                                                        }
+                                                    }}
                                                     className={`
                                                         w-full px-6 py-5 flex items-center gap-4 text-left transition-all duration-200
                                                         group relative
-                                                        ${isDomainActive ? 'bg-white' : 'hover:bg-slate-50 bg-white'}
+                                                        ${isDomainActive ? \'bg-blue-600/5\' : \'hover:bg-slate-800/40 bg-transparent\'}
                                                     `}
                                                 >
                                                     {isDomainActive && (
@@ -523,19 +588,19 @@
                                                     )}
                                                     
                                                     <div className={`
-                                                        flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold shadow-sm transition-all
+                                                        flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold shadow-lg transition-all
                                                         ${isDomainActive 
-                                                            ? `${activeTier.lightColor} ${activeTier.textColor} scale-110` 
-                                                            : 'bg-slate-100 text-slate-400 group-hover:bg-slate-200 group-hover:text-slate-600'}
+                                                            ? `${activeTier.lightColor} ${activeTier.textColor} scale-110 ring-1 ${activeTier.borderColor}` 
+                                                            : \'bg-slate-800 text-slate-600 group-hover:bg-slate-700 group-hover:text-slate-400\'}
                                                     `}>
                                                         {domain.id}
                                                     </div>
                                                     <div className="flex-1">
-                                                        <span className={`block text-sm font-semibold transition-colors ${isDomainActive ? 'text-slate-900' : 'text-slate-600 group-hover:text-slate-800'}`}>
+                                                        <span className={`block text-sm font-semibold transition-colors ${isDomainActive ? \'text-white\' : \'text-slate-500 group-hover:text-slate-300\'}`}>
                                                             {domain.name}
                                                         </span>
                                                     </div>
-                                                    <ChevronRight className={`w-4 h-4 transition-all ${isDomainActive ? `opacity-100 translate-x-0 ${activeTier.textColor}` : 'opacity-0 -translate-x-2 text-slate-300'}`} />
+                                                    <ChevronRight className={`w-4 h-4 transition-all ${isDomainActive ? `opacity-100 translate-x-0 ${activeTier.textColor}` : \'opacity-0 -translate-x-2 text-slate-700 group-hover:opacity-50 group-hover:translate-x-0\'}`} />
                                                 </button>
                                             );
                                         })}
@@ -544,88 +609,78 @@
                             </div>
 
                             {/* Right: Component Details */}
-                            <div className="w-full lg:w-2/3">
-                                <div className="bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50 flex flex-col min-h-[600px] overflow-hidden relative animate-scale-in">
+                            <div id="content-area" className="w-full lg:w-2/3">
+                                <div className="bg-slate-900/60 rounded-2xl border border-slate-800 shadow-2xl flex flex-col min-h-[600px] overflow-hidden relative animate-scale-in backdrop-blur-sm">
                                     
-                                    {/* Decorative Top Gradient */}
-                                    <div className={`h-2 w-full bg-gradient-to-r ${activeTier.gradient}`} />
+                                    {/* Top Accent */}
+                                    <div className={`h-1.5 w-full bg-gradient-to-r ${activeTier.gradient}`} />
 
                                     {/* Domain Header */}
-                                    <div className="px-8 py-8 border-b border-slate-100 bg-slate-50/30">
-                                        <div className="flex items-center gap-3 mb-3">
+                                    <div className="px-8 py-10 border-b border-slate-800/50 bg-slate-800/20">
+                                        <div className="flex items-center gap-3 mb-4">
                                             <span className={`
-                                                px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider
-                                                ${activeTier.lightColor} ${activeTier.textColor}
+                                                px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-widest
+                                                ${activeTier.lightColor} ${activeTier.textColor} border ${activeTier.borderColor}
                                             `}>
                                                 Domain {activeDomain.id}
                                             </span>
                                         </div>
-                                        <h2 className="text-3xl font-display font-bold text-slate-900 flex items-center gap-4">
+                                        <h2 className="text-3xl md:text-4xl font-display font-bold text-white flex items-center gap-5">
                                             {activeDomain.name}
-                                            <span className="text-slate-300">
+                                            <span className="text-slate-700">
                                                 {activeDomain.icon}
                                             </span>
                                         </h2>
                                     </div>
 
                                     {/* Components List */}
-                                    <div className="p-8 flex-1 bg-white">
+                                    <div className="p-8 flex-1">
                                         <div className="flex items-center justify-between mb-8">
-                                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Competency Components</h3>
-                                            <div className="h-px flex-1 bg-slate-100 ml-4"></div>
+                                            <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Competency Components</h3>
+                                            <div className="h-px flex-1 bg-slate-800/50 ml-6"></div>
                                         </div>
                                         
                                         <div className="space-y-6">
                                             {activeDomain.components.map((comp) => (
-                                                <div key={comp.id} className="group flex gap-6 p-4 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
+                                                <div key={comp.id} className="group flex gap-6 p-5 rounded-2xl hover:bg-slate-800/40 transition-all duration-300 border border-transparent hover:border-slate-800">
                                                     <div className={`
-                                                        flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center font-display font-bold text-lg shadow-sm
-                                                        transition-all duration-300 group-hover:scale-110 group-hover:shadow-md
-                                                        ${activeTier.lightColor} ${activeTier.textColor}
+                                                        flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center font-display font-bold text-lg shadow-xl
+                                                        transition-all duration-300 group-hover:scale-110 group-hover:rotate-3
+                                                        ${activeTier.lightColor} ${activeTier.textColor} border ${activeTier.borderColor}
                                                     `}>
                                                         {comp.id}
                                                     </div>
                                                     <div className="pt-1">
-                                                        <p className="text-slate-700 leading-relaxed text-lg font-medium group-hover:text-slate-900 transition-colors">
+                                                        <p className="text-slate-300 leading-relaxed text-lg font-medium group-hover:text-white transition-colors">
                                                             {comp.desc}
                                                         </p>
                                                         
-                                                        {/* Tags (Visual Only) */}
-                                                        <div className="mt-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0 duration-300">
-                                                            <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-slate-100 text-slate-500">
+                                                        {/* Visual Tags */}
+                                                        <div className="mt-5 flex gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0 duration-300">
+                                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-500 uppercase tracking-widest border border-slate-700/50">
                                                                 Knowledge
                                                             </span>
-                                                            <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-slate-100 text-slate-500">
+                                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-500 uppercase tracking-widest border border-slate-700/50">
                                                                 Application
                                                             </span>
                                                         </div>
                                                     </div>
                                                 </div>
                                             ))}
-
-                                            {activeDomain.components.length === 0 && (
-                                                <div className="flex flex-col items-center justify-center py-20 text-center opacity-50">
-                                                    <div className="bg-slate-100 p-4 rounded-full mb-4">
-                                                        <Info className="w-8 h-8 text-slate-400" />
-                                                    </div>
-                                                    <p className="text-slate-500 font-medium">No components listed for this domain.</p>
-                                                </div>
-                                            )}
                                         </div>
                                     </div>
 
                                     {/* Card Footer */}
-                                    <div className="px-8 py-4 bg-slate-50/80 border-t border-slate-100 text-xs font-medium text-slate-500 flex justify-between items-center backdrop-blur-sm">
-                                        <span className="flex items-center gap-1.5">
-                                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                                            v1.0.2 Live
+                                    <div className="px-8 py-5 bg-slate-900/40 border-t border-slate-800/50 text-[10px] font-bold text-slate-500 flex justify-between items-center backdrop-blur-md">
+                                        <span className="flex items-center gap-2 uppercase tracking-widest">
+                                            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                                            v1.2.0 Production
                                         </span>
-                                        <div className="flex items-center gap-2 opacity-75 hover:opacity-100 transition-opacity cursor-help">
+                                        <div className="flex items-center gap-2 opacity-75 hover:opacity-100 transition-opacity cursor-help uppercase tracking-widest">
                                             <Info className="w-4 h-4" />
-                                            <span>Select another domain to view details</span>
+                                            <span>System Ready</span>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
