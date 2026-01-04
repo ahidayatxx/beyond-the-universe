@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Health Competency Framework</title>
+    
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                fontFamily: {
+                    sans: ['Inter', 'sans-serif'],
+                    display: ['Plus Jakarta Sans', 'sans-serif'],
+                },
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#151f32', 
+                        },
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'scale-in': 'scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        scaleIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'glow': '0 0 15px rgba(59, 130, 246, 0.15)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        
+        body {
+            background-color: #f8fafc;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.03) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.03) 0px, transparent 50%);
+        }
+    </style>
+</head>
+<body class="text-slate-900 antialiased min-h-screen flex flex-col">
+    <div id="root" class="flex-grow"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- Inline Icons Helper ---
+        const IconBase = ({ children, className, ...props }) => (
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className={className} 
+                {...props}
+            >
+                {children}
+            </svg>
+        );
+
+        // --- Icon Definitions ---
+        const BookOpen = (props) => (
+            <IconBase {...props}>
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+            </IconBase>
+        );
+
+        const Shield = (props) => (
+            <IconBase {...props}>
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+            </IconBase>
+        );
+
+        const Monitor = (props) => (
+            <IconBase {...props}>
+                <rect width="20" height="14" x="2" y="3" rx="2" />
+                <line x1="8" x2="16" y1="21" y2="21" />
+                <line x1="12" x2="12" y1="17" y2="21" />
+            </IconBase>
+        );
+
+        const Database = (props) => (
+            <IconBase {...props}>
+                <ellipse cx="12" cy="5" rx="9" ry="3" />
+                <path d="M3 5V19A9 3 0 0 0 21 19V5" />
+                <path d="M3 12A9 3 0 0 0 21 12" />
+            </IconBase>
+        );
+
+        const Activity = (props) => (
+            <IconBase {...props}>
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+            </IconBase>
+        );
+
+        const Server = (props) => (
+            <IconBase {...props}>
+                <rect width="20" height="8" x="2" y="2" rx="2" ry="2" />
+                <rect width="20" height="8" x="2" y="14" rx="2" ry="2" />
+                <line x1="6" x2="6.01" y1="6" y2="6" />
+                <line x1="6" x2="6.01" y1="18" y2="18" />
+            </IconBase>
+        );
+
+        const Globe = (props) => (
+            <IconBase {...props}>
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" x2="22" y1="12" y2="12" />
+                <path d="a15.3 15.3 0 0 1 4-10 15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z" />
+            </IconBase>
+        );
+
+        const Zap = (props) => (
+            <IconBase {...props}>
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </IconBase>
+        );
+
+        const ChevronRight = (props) => (
+            <IconBase {...props}>
+                <path d="m9 18 6-6-6-6" />
+            </IconBase>
+        );
+
+        const Layers = (props) => (
+            <IconBase {...props}>
+                <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                <polyline points="2 17 12 22 22 17" />
+                <polyline points="2 12 12 17 22 12" />
+            </IconBase>
+        );
+
+        const User = (props) => (
+            <IconBase {...props}>
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+            </IconBase>
+        );
+
+        const Users = (props) => (
+            <IconBase {...props}>
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </IconBase>
+        );
+
+        const Briefcase = (props) => (
+            <IconBase {...props}>
+                <rect width="20" height="14" x="2" y="7" rx="2" ry="2" />
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+            </IconBase>
+        );
+
+        const Search = (props) => (
+            <IconBase {...props}>
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+            </IconBase>
+        );
+
+        const Info = (props) => (
+            <IconBase {...props}>
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 16v-4" />
+                <path d="M12 8h.01" />
+            </IconBase>
+        );
+
+        // --- Data Structure derived from provided CSV snippets ---
+        const frameworkData = [
+            {
+                tier: 1,
+                title: "Foundational Literacy",
+                subtitle: "Digital Health Essentials",
+                color: "bg-emerald-500",
+                gradient: "from-emerald-500 to-teal-400",
+                lightColor: "bg-emerald-50",
+                borderColor: "border-emerald-200",
+                textColor: "text-emerald-700",
+                icon: <User className="w-6 h-6" />,
+                focus: "To equip the entire health workforce with the core skills and understanding needed to participate safely, ethically, and effectively in a digitally-enabled healthcare environment.",
+                audience: "All individuals who deliver or assist in the delivery of health services, including clinicians, administrators, community health workers, and support staff.",
+                domains: [
+                {
+                    id: "A",
+                    name: "Digital Professionalism & Ethics",
+                    icon: <Shield className="w-5 h-5" />,
+                    components: [
+                    { id: "A1", desc: "Understands and adheres to relevant legislation, professional codes of conduct, policy, and ethics, including data privacy and security requirements." },
+                    { id: "A2", desc: "Understands the benefits and risks of a digital presence and manages one's online footprint to maintain professional and public trust." },
+                    { id: "A3", desc: "Employs digital technologies in personal and professional learning and maintains currency with tools and innovations in digital health." }
+                    ]
+                },
+                {
+                    id: "B",
+                    name: "Digital Tools & Systems",
+                    icon: <Monitor className="w-5 h-5" />,
+                    components: [
+                    { id: "B1", desc: "Recognises and uses the right technology for the needs of both the patient and the worker to deliver safe, consumer-centric services." },
+                    { id: "B2", desc: "Confidently uses a range of appropriate devices, applications, and software for undertaking role responsibilities." },
+                    { id: "B3", desc: "Understands where to seek support and how to work around technology or process failures to maintain safe service delivery." }
+                    ]
+                },
+                {
+                    id: "C",
+                    name: "Information & Data Use",
+                    icon: <Database className="w-5 h-5" />,
+                    components: [
+                    { id: "C1", desc: "Understands that all health workers play a crucial role in the capture and quality of health data." },
+                    { id: "C2", desc: "Interprets data reports to improve personal practice and service delivery." }, 
+                    { id: "C3", desc: "Ensures accurate and timely documentation in digital health records." }
+                    ]
+                }
+                ]
+            },
+            {
+                tier: 2,
+                title: "Management & Leadership",
+                subtitle: "Driving Digital Change",
+                color: "bg-blue-500",
+                gradient: "from-blue-500 to-indigo-500",
+                lightColor: "bg-blue-50",
+                borderColor: "border-blue-200",
+                textColor: "text-blue-700",
+                icon: <Users className="w-6 h-6" />,
+                focus: "Leading digital transformation and managing health information systems at a departmental or organizational level.",
+                audience: "Health managers, project leads, clinical leaders, and digital health champions.",
+                isPlaceholder: true, 
+                domains: [
+                {
+                    id: "D",
+                    name: "Clinical Informatics Leadership",
+                    icon: <Activity className="w-5 h-5" />,
+                    components: [
+                    { id: "D1", desc: "Advocates for the effective use of digital health tools to improve clinical outcomes." },
+                    { id: "D2", desc: "Leads implementation of new digital workflows in clinical practice." }
+                    ]
+                },
+                {
+                    id: "E",
+                    name: "Data Analysis & Quality",
+                    icon: <Briefcase className="w-5 h-5" />,
+                    components: [
+                    { id: "E1", desc: "Analyses health data trends to support decision making." }
+                    ]
+                }
+                ]
+            },
+            {
+                tier: 3,
+                title: "Strategic Leadership",
+                subtitle: "Shaping the Future",
+                color: "bg-purple-600",
+                gradient: "from-purple-600 to-fuchsia-600",
+                lightColor: "bg-purple-50",
+                borderColor: "border-purple-200",
+                textColor: "text-purple-800",
+                icon: <Layers className="w-6 h-6" />,
+                focus: "Developing strategy, governance, and innovation frameworks for the health ecosystem.",
+                audience: "Executives, CIOs, CNIOs, Policy Makers, and Senior Digital Health Specialists.",
+                domains: [
+                {
+                    id: "I",
+                    name: "Health Informatics Practice",
+                    icon: <BookOpen className="w-5 h-5" />,
+                    components: [
+                    { id: "I1", desc: "Applies theoretical and conceptual frameworks to their practice and relates the history of health informatics to the current and future health environment." },
+                    { id: "I2", desc: "Appraises the structure and design of health information in different use contexts." },
+                    { id: "I3", desc: "Appraises current scientific literature for its contribution to evidence-informed digital health practice." }
+                    ]
+                },
+                {
+                    id: "J",
+                    name: "Enterprise Systems & Interoperability",
+                    icon: <Server className="w-5 h-5" />,
+                    components: [
+                    { id: "J1", desc: "Differentiates enterprise and information systems architecture components." },
+                    { id: "J2", desc: "Appraises the relevant standards, including messaging, exchange formats, and ontologies, to support safe and effective system interfacing and interoperability." },
+                    { id: "J3", desc: "Applies appropriate practices throughout the information system lifecycle and selects system security risk and mitigation strategies." }
+                    ]
+                },
+                {
+                    id: "K",
+                    name: "Strategic Governance & Policy",
+                    icon: <Globe className="w-5 h-5" />,
+                    components: [
+                    { id: "K1", desc: "Builds alignment between information systems and business/clinical goals and strategies." },
+                    { id: "K2", desc: "Interprets the legislative, regulatory, and policy obligations that are relevant in specific digital health contexts." },
+                    { id: "K3", desc: "Distinguishes approaches to health data governance, including sovereignty, in different contexts." }
+                    ]
+                },
+                {
+                    id: "L",
+                    name: "Innovation & Health Economics",
+                    icon: <Zap className="w-5 h-5" />,
+                    components: [
+                    { id: "L1", desc: "Appraises new data sources and emerging technologies and their relevance to health." },
+                    { id: "L2", desc: "Determines the economic impact of digital health initiatives." },
+                    { id: "L3", desc: "Selects appropriate value management and benefit realisation strategies to support the delivery of successful outcomes." }
+                    ]
+                }
+                ]
+            }
+        ];
+
+        const App = () => {
+            const [activeTier, setActiveTier] = useState(frameworkData[0]);
+            const [activeDomain, setActiveDomain] = useState(frameworkData[0].domains[0]);
+            const [searchQuery, setSearchQuery] = useState("");
+
+            const handleTierClick = (tier) => {
+                setActiveTier(tier);
+                setActiveDomain(tier.domains[0]);
+            };
+
+            return (
+                <div className="min-h-screen font-sans selection:bg-brand-100 selection:text-brand-700 pb-20">
+                    
+                    {/* Modern Glassy Header */}
+                    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm transition-all duration-300">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="bg-gradient-to-br from-blue-600 to-indigo-600 p-2 rounded-xl text-white shadow-lg shadow-blue-500/30">
+                                    <Activity className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <h1 className="text-xl font-display font-bold text-slate-900 leading-none tracking-tight">Digital Health</h1>
+                                    <p className="text-xs text-slate-500 font-medium tracking-wide mt-0.5">Competency Framework Explorer</p>
+                                </div>
+                            </div>
+                            
+                            <div className="relative hidden md:block group">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                                <input 
+                                    type="text" 
+                                    placeholder="Find competencies..." 
+                                    className="pl-10 pr-4 py-2.5 bg-slate-100/80 border border-transparent rounded-full text-sm font-medium focus:bg-white focus:border-blue-300 focus:ring-4 focus:ring-blue-100 w-72 transition-all outline-none placeholder:text-slate-400"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                    </header>
+
+                    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fade-in">
+                        
+                        {/* Hero Section */}
+                        <div className="mb-12 max-w-4xl">
+                            <h2 className="text-4xl md:text-5xl font-display font-bold text-slate-900 mb-6 tracking-tight leading-tight">
+                                Explore the <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-violet-600">Competency Tiers</span>
+                            </h2>
+                            <p className="text-lg text-slate-600 leading-relaxed max-w-2xl">
+                                A comprehensive guide defining the essential skills, knowledge, and capabilities required for the modern digital health workforce across three distinct levels of practice.
+                            </p>
+                        </div>
+
+                        {/* Tier Navigation Cards */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                            {frameworkData.map((tier) => {
+                                const isActive = activeTier.tier === tier.tier;
+                                return (
+                                    <button
+                                        key={tier.tier}
+                                        onClick={() => handleTierClick(tier)}
+                                        className={`
+                                            relative overflow-hidden rounded-2xl p-6 text-left transition-all duration-300
+                                            group border
+                                            ${isActive 
+                                                ? 'bg-white border-transparent shadow-xl scale-[1.02] ring-2 ring-offset-2 ring-offset-slate-50' 
+                                                : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-lg hover:-translate-y-1 shadow-sm'
+                                            }
+                                            ${isActive ? `ring-${tier.color.split('-')[1]}-500` : ''}
+                                        `}
+                                    >
+                                        {/* Gradient Background for Active State */}
+                                        {isActive && (
+                                            <div className={`absolute inset-0 opacity-5 bg-gradient-to-br ${tier.gradient}`} />
+                                        )}
+                                        
+                                        <div className="relative z-10 flex flex-col h-full">
+                                            <div className="flex items-center justify-between mb-6">
+                                                <span className={`
+                                                    text-xs font-bold tracking-widest uppercase px-2 py-1 rounded-md
+                                                    ${isActive ? `bg-gradient-to-r ${tier.gradient} text-white shadow-md` : 'bg-slate-100 text-slate-500'}
+                                                `}>
+                                                    Tier {tier.tier}
+                                                </span>
+                                                <div className={`
+                                                    p-2.5 rounded-xl transition-colors
+                                                    ${isActive ? `bg-gradient-to-br ${tier.gradient} text-white shadow-lg` : 'bg-slate-50 text-slate-400 group-hover:bg-slate-100 group-hover:text-slate-600'}
+                                                `}>
+                                                    {tier.icon}
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="mt-auto">
+                                                <h3 className={`text-xl font-display font-bold mb-1 ${isActive ? 'text-slate-900' : 'text-slate-700'}`}>
+                                                    {tier.title}
+                                                </h3>
+                                                <p className={`text-sm font-medium ${isActive ? tier.textColor : 'text-slate-400'}`}>
+                                                    {tier.subtitle}
+                                                </p>
+                                            </div>
+
+                                            {/* Decorative Indicator */}
+                                            {isActive && (
+                                                <div className={`absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r ${tier.gradient}`} />
+                                            )}
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {/* Main Content Layout */}
+                        <div className="flex flex-col lg:flex-row gap-8 animate-slide-up">
+                            
+                            {/* Left: Sidebar (Context & Domains) */}
+                            <div className="w-full lg:w-1/3 space-y-6">
+                                {/* Context Card */}
+                                <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-soft">
+                                    <div className="mb-6">
+                                        <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                                            Tier Focus
+                                        </h4>
+                                        <p className="text-sm text-slate-700 font-medium leading-relaxed">{activeTier.focus}</p>
+                                    </div>
+                                    <div className="pt-6 border-t border-slate-100">
+                                        <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                            Target Audience
+                                        </h4>
+                                        <p className="text-sm text-slate-700 font-medium leading-relaxed">{activeTier.audience}</p>
+                                    </div>
+                                </div>
+
+                                {/* Domain Navigation List */}
+                                <div className="bg-white rounded-2xl border border-slate-200 shadow-soft overflow-hidden">
+                                    <div className="px-6 py-4 bg-slate-50/50 border-b border-slate-200 flex justify-between items-center backdrop-blur-sm">
+                                        <h3 className="font-display font-bold text-slate-800">Domains</h3>
+                                        <span className="text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full uppercase tracking-wide">
+                                            {activeTier.domains.length} Areas
+                                        </span>
+                                    </div>
+                                    <div className="divide-y divide-slate-50">
+                                        {activeTier.domains.map((domain) => {
+                                            const isDomainActive = activeDomain.id === domain.id;
+                                            return (
+                                                <button
+                                                    key={domain.id}
+                                                    onClick={() => setActiveDomain(domain)}
+                                                    className={`
+                                                        w-full px-6 py-5 flex items-center gap-4 text-left transition-all duration-200
+                                                        group relative
+                                                        ${isDomainActive ? 'bg-white' : 'hover:bg-slate-50 bg-white'}
+                                                    `}
+                                                >
+                                                    {isDomainActive && (
+                                                        <div className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b ${activeTier.gradient}`} />
+                                                    )}
+                                                    
+                                                    <div className={`
+                                                        flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold shadow-sm transition-all
+                                                        ${isDomainActive 
+                                                            ? `${activeTier.lightColor} ${activeTier.textColor} scale-110` 
+                                                            : 'bg-slate-100 text-slate-400 group-hover:bg-slate-200 group-hover:text-slate-600'}
+                                                    `}>
+                                                        {domain.id}
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <span className={`block text-sm font-semibold transition-colors ${isDomainActive ? 'text-slate-900' : 'text-slate-600 group-hover:text-slate-800'}`}>
+                                                            {domain.name}
+                                                        </span>
+                                                    </div>
+                                                    <ChevronRight className={`w-4 h-4 transition-all ${isDomainActive ? `opacity-100 translate-x-0 ${activeTier.textColor}` : 'opacity-0 -translate-x-2 text-slate-300'}`} />
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Right: Component Details */}
+                            <div className="w-full lg:w-2/3">
+                                <div className="bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50 flex flex-col min-h-[600px] overflow-hidden relative animate-scale-in">
+                                    
+                                    {/* Decorative Top Gradient */}
+                                    <div className={`h-2 w-full bg-gradient-to-r ${activeTier.gradient}`} />
+
+                                    {/* Domain Header */}
+                                    <div className="px-8 py-8 border-b border-slate-100 bg-slate-50/30">
+                                        <div className="flex items-center gap-3 mb-3">
+                                            <span className={`
+                                                px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider
+                                                ${activeTier.lightColor} ${activeTier.textColor}
+                                            `}>
+                                                Domain {activeDomain.id}
+                                            </span>
+                                        </div>
+                                        <h2 className="text-3xl font-display font-bold text-slate-900 flex items-center gap-4">
+                                            {activeDomain.name}
+                                            <span className="text-slate-300">
+                                                {activeDomain.icon}
+                                            </span>
+                                        </h2>
+                                    </div>
+
+                                    {/* Components List */}
+                                    <div className="p-8 flex-1 bg-white">
+                                        <div className="flex items-center justify-between mb-8">
+                                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Competency Components</h3>
+                                            <div className="h-px flex-1 bg-slate-100 ml-4"></div>
+                                        </div>
+                                        
+                                        <div className="space-y-6">
+                                            {activeDomain.components.map((comp) => (
+                                                <div key={comp.id} className="group flex gap-6 p-4 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
+                                                    <div className={`
+                                                        flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center font-display font-bold text-lg shadow-sm
+                                                        transition-all duration-300 group-hover:scale-110 group-hover:shadow-md
+                                                        ${activeTier.lightColor} ${activeTier.textColor}
+                                                    `}>
+                                                        {comp.id}
+                                                    </div>
+                                                    <div className="pt-1">
+                                                        <p className="text-slate-700 leading-relaxed text-lg font-medium group-hover:text-slate-900 transition-colors">
+                                                            {comp.desc}
+                                                        </p>
+                                                        
+                                                        {/* Tags (Visual Only) */}
+                                                        <div className="mt-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0 duration-300">
+                                                            <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-slate-100 text-slate-500">
+                                                                Knowledge
+                                                            </span>
+                                                            <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-slate-100 text-slate-500">
+                                                                Application
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+
+                                            {activeDomain.components.length === 0 && (
+                                                <div className="flex flex-col items-center justify-center py-20 text-center opacity-50">
+                                                    <div className="bg-slate-100 p-4 rounded-full mb-4">
+                                                        <Info className="w-8 h-8 text-slate-400" />
+                                                    </div>
+                                                    <p className="text-slate-500 font-medium">No components listed for this domain.</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Card Footer */}
+                                    <div className="px-8 py-4 bg-slate-50/80 border-t border-slate-100 text-xs font-medium text-slate-500 flex justify-between items-center backdrop-blur-sm">
+                                        <span className="flex items-center gap-1.5">
+                                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                                            v1.0.2 Live
+                                        </span>
+                                        <div className="flex items-center gap-2 opacity-75 hover:opacity-100 transition-opacity cursor-help">
+                                            <Info className="w-4 h-4" />
+                                            <span>Select another domain to view details</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
