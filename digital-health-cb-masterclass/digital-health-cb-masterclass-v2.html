@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Health Competency Framework | Masterclass</title>
+
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                fontFamily: {
+                    sans: ['Inter', 'sans-serif'],
+                    display: ['Plus Jakarta Sans', 'sans-serif'],
+                },
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#151f32', 
+                        },
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'scale-in': 'scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        scaleIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'glow': '0 0 15px rgba(59, 130, 246, 0.15)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- React Dependencies -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide-react@latest"></script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155; 
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569; 
+        }
+        
+        body {
+            background-color: #020617; /* Dark Blue / Slate 950 */
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.08) 0px, transparent 50%);
+        }
+
+        .mobile-menu-enter {
+            transform: translateX(-100%);
+        }
+        .mobile-menu-enter-active {
+            transform: translateX(0);
+            transition: transform 0.3s ease-out;
+        }
+    </style>
+</head>
+<body class="text-slate-100 antialiased min-h-screen flex flex-col">
+    <div id="root" class="flex-grow"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- Inline Icons Helper ---
+        const IconBase = ({ children, className, ...props }) => (
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className={className} 
+                {...props}
+            >
+                {children}
+            </svg>
+        );
+
+        // --- Icon Definitions ---
+        const Menu = (props) => (
+            <IconBase {...props}>
+                <line x1="4" x2="20" y1="12" y2="12" />
+                <line x1="4" x2="20" y1="6" y2="6" />
+                <line x1="4" x2="20" y1="18" y2="18" />
+            </IconBase>
+        );
+
+        const X = (props) => (
+            <IconBase {...props}>
+                <path d="M18 6 6 18" />
+                <path d="m6 6 12 12" />
+            </IconBase>
+        );
+
+        const BookOpen = (props) => (
+            <IconBase {...props}>
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+            </IconBase>
+        );
+
+        const ShieldCheck = (props) => (
+            <IconBase {...props}>
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+                <path d="m9 12 2 2 4-4" />
+            </IconBase>
+        );
+
+        const Monitor = (props) => (
+            <IconBase {...props}>
+                <rect width="20" height="14" x="2" y="3" rx="2" />
+                <line x1="8" x2="16" y1="21" y2="21" />
+                <line x1="12" x2="12" y1="17" y2="21" />
+            </IconBase>
+        );
+
+        const Database = (props) => (
+            <IconBase {...props}>
+                <ellipse cx="12" cy="5" rx="9" ry="3" />
+                <path d="M3 5V19A9 3 0 0 0 21 19V5" />
+                <path d="M3 12A9 3 0 0 0 21 12" />
+            </IconBase>
+        );
+
+        const Activity = (props) => (
+            <IconBase {...props}>
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+            </IconBase>
+        );
+
+        const Server = (props) => (
+            <IconBase {...props}>
+                <rect width="20" height="8" x="2" y="2" rx="2" ry="2" />
+                <rect width="20" height="8" x="2" y="14" rx="2" ry="2" />
+                <line x1="6" x2="6.01" y1="6" y2="6" />
+                <line x1="6" x2="6.01" y1="18" y2="18" />
+            </IconBase>
+        );
+
+        const Globe = (props) => (
+            <IconBase {...props}>
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" x2="22" y1="12" y2="12" />
+                <path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </IconBase>
+        );
+
+        const Zap = (props) => (
+            <IconBase {...props}>
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </IconBase>
+        );
+
+        const ChevronRight = (props) => (
+            <IconBase {...props}>
+                <path d="m9 18 6-6-6-6" />
+            </IconBase>
+        );
+
+        const Layers = (props) => (
+            <IconBase {...props}>
+                <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                <polyline points="2 17 12 22 22 17" />
+                <polyline points="2 12 12 17 22 12" />
+            </IconBase>
+        );
+
+        const UserCheck = (props) => (
+            <IconBase {...props}>
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <polyline points="16 11 18 13 22 9" />
+            </IconBase>
+        );
+
+        const Users = (props) => (
+            <IconBase {...props}>
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </IconBase>
+        );
+
+        const Briefcase = (props) => (
+            <IconBase {...props}>
+                <rect width="20" height="14" x="2" y="7" rx="2" ry="2" />
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+            </IconBase>
+        );
+
+        const Search = (props) => (
+            <IconBase {...props}>
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+            </IconBase>
+        );
+
+        const Info = (props) => (
+            <IconBase {...props}>
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 16v-4" />
+                <path d="M12 8h.01" />
+            </IconBase>
+        );
+        
+        const Target = (props) => (
+            <IconBase {...props}>
+                <circle cx="12" cy="12" r="10" />
+                <circle cx="12" cy="12" r="6" />
+                <circle cx="12" cy="12" r="2" />
+            </IconBase>
+        );
+        
+        const GraduationCap = (props) => (
+            <IconBase {...props}>
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                <path d="M6 12v5c3 3 9 3 12 0v-5" />
+            </IconBase>
+        );
+        
+        const Layout = (props) => (
+            <IconBase {...props}>
+                <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                <line x1="3" x2="21" y1="9" y2="9" />
+                <line x1="9" x2="9" y1="21" y2="9" />
+            </IconBase>
+        );
+        
+        const Stethoscope = (props) => (
+            <IconBase {...props}>
+                <path d="M4.8 2.3A.3.3 0 0 1 5 2h14a.3.3 0 0 1 .2.3v3.3a.3.3 0 0 1-.2.3L15 8.7a.3.3 0 0 1-.4-.2c-.2-1.2-1.6-1.5-2.6-1.5s-2.4.3-2.6 1.5a.3.3 0 0 1-.4.2L4.8 5.9a.3.3 0 0 1-.2-.3V2.3z" />
+                <path d="M8 8.8v2.7a2.5 2.5 0 0 0 5 0V8.8" />
+                <path d="M10.5 14v4" />
+                <circle cx="10.5" cy="19.5" r="1.5" />
+            </IconBase>
+        );
+        
+        const BarChart3 = (props) => (
+            <IconBase {...props}>
+                <path d="M3 3v18h18" />
+                <path d="M18 17V9" />
+                <path d="M13 17V5" />
+                <path d="M8 17v-3" />
+            </IconBase>
+        );
+        
+        const Lightbulb = (props) => (
+            <IconBase {...props}>
+                <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2.4 1.5-3.8 0-3.2-2.5-5.7-5.7-5.7C9.2 2 7 4.5 7 7.7c0 1.3.5 2.7 1.5 3.8.8.8 1.3 1.5 1.5 2.5" />
+                <path d="M9 18h6" />
+                <path d="M10 22h4" />
+            </IconBase>
+        );
+        
+        const Sparkles = (props) => (
+            <IconBase {...props}>
+                <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+            </IconBase>
+        );
+
+        const App = () => {
+            const [selectedTier, setSelectedTier] = useState(0);
+            const [searchQuery, setSearchQuery] = useState("");
+            const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+            const [mounted, setMounted] = useState(false);
+
+            useEffect(() => {
+                setMounted(true);
+            }, []);
+
+            const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+
+            const data = [
+                {
+                    id: "tier1",
+                    level: "Foundational Digital Health Literacy",
+                    shortTitle: "Foundational",
+                    color: "bg-emerald-500",
+                    gradient: "from-emerald-500 to-teal-400",
+                    lightColor: "bg-emerald-500/10",
+                    borderColor: "border-emerald-500/30",
+                    textColor: "text-emerald-400",
+                    icon: BookOpen,
+                    stats: "3 Courses",
+                    objective: "To equip the entire health workforce with the core skills and understanding needed to participate safely, ethically, and effectively in a digitally-enabled healthcare environment.",
+                    profile: "All individuals who deliver or assist in the delivery of health services, including clinicians, administrators, community health workers, and support staff.",
+                    courses: [
+                        {
+                            id: "c1",
+                            title: "1. Being a HCP in a Digital World",
+                            icon: Globe,
+                            tags: ["Ethics", "Communication", "Telehealth"],
+                            description: "This course explores the domains of Digital Professionalism & Ethics, Digital Tools & Systems, and Digital Communication. Participants will learn to adhere to digital legislation and ethics, manage their online professional footprint, and utilize communication technologies like telehealth. It also covers the fundamentals of Information & Data Use to support decision-making and introduces concepts in Clinical & Process Improvement and Enterprise Systems."
+                        },
+                        {
+                            id: "c2",
+                            title: "2. Responsible Digital Transformation",
+                            icon: ShieldCheck,
+                            tags: ["Governance", "Security", "Policy"],
+                            description: "Focusing on Strategic Governance & Policy and Clinical & Process Improvement, this course guides learners in interpreting legislative obligations and data governance. It covers Digital Professionalism & Ethics and Enterprise Systems & Interoperability, enabling participants to advocate for digital innovation, apply system security practices, and support ethical information governance."
+                        },
+                        {
+                            id: "c3",
+                            title: "3. EMR's and the Surrounding Ecosystem",
+                            icon: Database,
+                            tags: ["EHRs", "Data Use", "Systems"],
+                            description: "This course centers on Digital Tools & Systems and Information & Data Use. It equips learners to confidently use devices and Electronic Health Records (EHRs) for safe, consumer-centric service delivery. It also touches upon Enterprise Systems & Interoperability to help staff differentiate architecture components and support data-driven decision-making."
+                        }
+                    ]
+                },
+                {
+                    id: "tier2",
+                    level: "Applied Digital Health Practice",
+                    shortTitle: "Applied Practice",
+                    color: "bg-blue-500",
+                    gradient: "from-blue-500 to-indigo-500",
+                    lightColor: "bg-blue-500/10",
+                    borderColor: "border-blue-500/30",
+                    textColor: "text-blue-400",
+                    icon: Activity,
+                    stats: "5 Courses",
+                    objective: "To enable health professionals and managers to optimize clinical and administrative processes, lead local digital health initiatives, and use data for service improvement.",
+                    profile: "Health professionals in supervisory roles, clinic and service managers, project leads, and health program managers.",
+                    courses: [
+                        {
+                            id: "c4",
+                            title: "4. Digital Medicine and Digital Therapeutics",
+                            icon: Stethoscope,
+                            tags: ["Innovation", "Therapeutics"],
+                            description: "This course applies concepts from Digital Tools & Systems and Innovation & Health Economics. It focuses on recognizing and using the right technologies for patient needs and appraising new data sources and emerging technologies relevant to modern health practice."
+                        },
+                        {
+                            id: "c5",
+                            title: "5. Augmented Intelligence in Healthcare",
+                            icon: Lightbulb,
+                            tags: ["AI", "Future Tech"],
+                            description: "By integrating Digital Tools & Systems with Innovation & Health Economics, this course prepares professionals to appraise emerging AI technologies. Participants will learn to confidently use advanced applications and recognize appropriate technology to deliver safe, consumer-centric services."
+                        },
+                        {
+                            id: "c6",
+                            title: "6. Data and IT Standards for Clinicians",
+                            icon: Layout,
+                            tags: ["Interoperability", "Standards"],
+                            description: "Centered on Information & Data Use and Enterprise Systems & Interoperability, this course emphasizes the importance of data integrity, capture, and standard terminology. It also covers Data Analytics & Governance, ensuring learners can appraise relevant standards for safe system interfacing and interoperability."
+                        },
+                        {
+                            id: "c10",
+                            title: "10. Digital Health Project & Change Management",
+                            icon: Users,
+                            tags: ["Leadership", "Strategy"],
+                            description: "This course focuses on Project & Change Management and Clinical & Process Improvement. It provides methodologies for effective program management and change leadership, while developing strategies for stakeholder engagement and business process re-engineering."
+                        },
+                        {
+                            id: "c11",
+                            title: "11. Health Data Analytics & Visualization",
+                            icon: BarChart3,
+                            tags: ["Analytics", "Visualization"],
+                            description: "Dedicated to Data Analytics & Governance, this course teaches the employment of descriptive and inferential statistics. Learners will identify effective visualization methods to facilitate knowledge discovery and data-driven insights."
+                        }
+                    ]
+                },
+                {
+                    id: "tier3",
+                    level: "Strategic Health Informatics Leadership",
+                    shortTitle: "Strategic Leadership",
+                    color: "bg-purple-600",
+                    gradient: "from-purple-600 to-fuchsia-600",
+                    lightColor: "bg-purple-600/10",
+                    borderColor: "border-purple-600/30",
+                    textColor: "text-purple-400",
+                    icon: Target,
+                    stats: "4 Courses",
+                    objective: "To guide the design, strategy, and transformation of the broader health ecosystem through the application of deep and specialized health informatics knowledge.",
+                    profile: "Health informaticians, Chief Information/Innovation Officers, digital health strategists, researchers, and senior policymakers.",
+                    courses: [
+                        {
+                            id: "c7",
+                            title: "7. Patient and Consumer Empowerment",
+                            icon: UserCheck,
+                            tags: ["Patient-Centric", "Access"],
+                            description: "This course highlights Patient-Centered Digital Services and Digital Communication & Collaboration. It advocates for patient access to health data and determines best practices for integrating health literacy into systems, utilizing tools that facilitate person-centered management."
+                        },
+                        {
+                            id: "c8",
+                            title: "8. Usability and UX in Digital Health",
+                            icon: Layers,
+                            tags: ["Design", "HCD"],
+                            description: "Focusing on Patient-Centered Digital Services, this course determines best practices in human-centered design (HCD), usability, and human factors to optimize digital health tools for user experience."
+                        },
+                        {
+                            id: "c9",
+                            title: "9. Value-Based Digital Health",
+                            icon: BarChart3,
+                            tags: ["Economics", "ROI"],
+                            description: "This course integrates Innovation & Health Economics, Strategic Governance & Policy, and Health Informatics Science & Theory. It focuses on determining the economic impact of digital initiatives, aligning systems with business goals, and selecting value management strategies to ensure successful outcomes."
+                        },
+                        {
+                            id: "c12",
+                            title: "12. Advanced Health Informatics Science",
+                            icon: GraduationCap,
+                            tags: ["Theory", "Research"],
+                            description: "Deepening knowledge in Health Informatics Science & Theory, this course applies theoretical frameworks to practice. It involves appraising the structure and design of health information across different contexts and relating the history of informatics to future health environments."
+                        }
+                    ]
+                }
+            ];
+
+            const activeTier = data[selectedTier];
+
+            if (!mounted) return <div className="min-h-screen flex items-center justify-center bg-slate-950 text-slate-400">Initializing Experience...</div>;
+
+            return (
+                <div className="min-h-screen font-sans selection:bg-blue-500/30 selection:text-blue-200 pb-20">
+                    
+                    {/* Dark Modern Header */}
+                    <header className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-lg border-b border-slate-800 shadow-xl transition-all duration-300">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="bg-gradient-to-br from-blue-600 to-indigo-600 p-2 rounded-xl text-white shadow-lg shadow-blue-500/20">
+                                    <Activity className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <h1 className="text-xl font-display font-bold text-white leading-none tracking-tight">Digital Health</h1>
+                                    <p className="text-xs text-slate-400 font-medium tracking-wide mt-0.5 uppercase">Competency Masterclass</p>
+                                </div>
+                            </div>
+                            
+                            <div className="flex items-center gap-4">
+                                <div className="relative hidden md:block group">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
+                                    <input 
+                                        type="text" 
+                                        placeholder="Find courses..." 
+                                        className="pl-10 pr-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-full text-sm font-medium focus:bg-slate-800 focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 w-64 lg:w-80 transition-all outline-none placeholder:text-slate-500 text-white"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                    />
+                                </div>
+
+                                {/* Hamburger Menu Button */}
+                                <button 
+                                    onClick={toggleMobileMenu}
+                                    className="md:hidden p-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white transition-colors border border-slate-700"
+                                    aria-label="Toggle menu"
+                                >
+                                    {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Mobile Navigation Dropdown */}
+                        <div className={`
+                            md:hidden absolute top-20 left-0 w-full bg-slate-900 border-b border-slate-800 overflow-hidden transition-all duration-300 ease-in-out
+                            ${isMobileMenuOpen ? 'max-h-[80vh] opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}
+                        `}>
+                            <div className="p-6 space-y-6">
+                                <div>
+                                    <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Select Tier</h3>
+                                    <div className="grid grid-cols-1 gap-3">
+                                        {data.map((tier, idx) => (
+                                            <button
+                                                key={tier.id}
+                                                onClick={() => { setSelectedTier(idx); setIsMobileMenuOpen(false); }}
+                                                className={`
+                                                    flex items-center gap-4 p-4 rounded-xl border transition-all
+                                                    ${selectedTier === idx
+                                                        ? `bg-slate-800 ${tier.borderColor} ring-1 ring-blue-500/20` 
+                                                        : 'bg-slate-800/40 border-slate-700/50'}
+                                                `}
+                                            >
+                                                <div className={`p-2 rounded-lg ${selectedTier === idx ? `bg-gradient-to-br ${tier.gradient} text-white` : 'bg-slate-700 text-slate-400'}`}>
+                                                    <tier.icon className="w-5 h-5" />
+                                                </div>
+                                                <div className="text-left">
+                                                    <div className="text-sm font-bold text-white">{tier.shortTitle}</div>
+                                                    <div className="text-xs text-slate-400">Tier {idx + 1}</div>
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fade-in">
+                        
+                        {/* Hero Section */}
+                        <div className="mb-12 max-w-4xl">
+                            <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-6 tracking-tight leading-tight">
+                                Explore the <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Competency Tiers</span>
+                            </h2>
+                            <p className="text-lg text-slate-400 leading-relaxed max-w-2xl">
+                                A strategic framework designed to elevate healthcare professionals from foundational literacy to transformative leadership.
+                            </p>
+                        </div>
+
+                        {/* Tier Navigation (Desktop Only) */}
+                        <div className="hidden md:grid grid-cols-3 gap-6 mb-12">
+                            {data.map((tier, idx) => {
+                                const isActive = selectedTier === idx;
+                                const TierIcon = tier.icon;
+                                return (
+                                    <button
+                                        key={tier.id}
+                                        onClick={() => setSelectedTier(idx)}
+                                        className={`
+                                            relative overflow-hidden rounded-2xl p-6 text-left transition-all duration-300
+                                            group border
+                                            ${isActive 
+                                                ? `bg-slate-800/50 ${tier.borderColor} shadow-2xl shadow-blue-500/10 scale-[1.02] ring-1 ring-blue-500/20` 
+                                                : 'bg-slate-900/40 border-slate-800 hover:border-slate-700 hover:bg-slate-800/30 hover:-translate-y-1 shadow-sm'
+                                            }
+                                        `}
+                                    >
+                                        <div className="relative z-10 flex flex-col h-full">
+                                            <div className="flex items-center justify-between mb-6">
+                                                <span className={`
+                                                    text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-md
+                                                    ${isActive ? `bg-gradient-to-r ${tier.gradient} text-white` : 'bg-slate-800 text-slate-500'}
+                                                `}>
+                                                    Tier {idx + 1}
+                                                </span>
+                                                <div className={`
+                                                    p-2.5 rounded-xl transition-all duration-300
+                                                    ${isActive ? `bg-gradient-to-br ${tier.gradient} text-white shadow-lg` : 'bg-slate-800 text-slate-600 group-hover:text-slate-400'}
+                                                `}>
+                                                    <TierIcon className="w-6 h-6" />
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="mt-auto">
+                                                <h3 className={`text-xl font-display font-bold mb-1 transition-colors ${isActive ? 'text-white' : 'text-slate-400'}`}>
+                                                    {tier.shortTitle}
+                                                </h3>
+                                                <p className={`text-sm font-medium ${isActive ? tier.textColor : 'text-slate-600'}`}>
+                                                    {tier.level}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {/* Main Content Layout */}
+                        <div className="flex flex-col lg:flex-row gap-8 animate-slide-up">
+                            
+                            {/* Left: Sidebar */}
+                            <div className="w-full lg:w-1/3 space-y-6">
+                                {/* Context Card */}
+                                <div className="bg-slate-900/60 rounded-2xl border border-slate-800 p-6 shadow-xl backdrop-blur-sm">
+                                    <div className="mb-6">
+                                        <h4 className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                                            Tier Objective
+                                        </h4>
+                                        <p className="text-sm text-slate-300 font-medium leading-relaxed">{activeTier.objective}</p>
+                                    </div>
+                                    <div className="pt-6 border-t border-slate-800">
+                                        <h4 className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                            Target Profile
+                                        </h4>
+                                        <p className="text-sm text-slate-300 font-medium leading-relaxed">{activeTier.profile}</p>
+                                    </div>
+                                </div>
+                                
+                                <div className={`p-6 rounded-2xl bg-gradient-to-br ${activeTier.gradient} text-white shadow-xl transform hover:scale-[1.02] transition-transform`}>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-white/80 text-[10px] font-bold uppercase tracking-widest">Included</span>
+                                        <GraduationCap className="w-5 h-5 text-white/90" />
+                                    </div>
+                                    <div className="text-3xl font-bold font-display">{activeTier.stats}</div>
+                                    <div className="mt-2 text-sm text-white/80 font-medium">Certification upon completion</div>
+                                </div>
+
+                            </div>
+
+                            {/* Right: Component Details */}
+                            <div id="content-area" className="w-full lg:w-2/3">
+                                <div className="bg-slate-900/60 rounded-2xl border border-slate-800 shadow-2xl flex flex-col min-h-[600px] overflow-hidden relative animate-scale-in backdrop-blur-sm">
+                                    
+                                    {/* Top Accent */}
+                                    <div className={`h-1.5 w-full bg-gradient-to-r ${activeTier.gradient}`} />
+
+                                    {/* Domain Header */}
+                                    <div className="px-8 py-10 border-b border-slate-800/50 bg-slate-800/20">
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <span className={`
+                                                px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-widest
+                                                ${activeTier.lightColor} ${activeTier.textColor} border ${activeTier.borderColor}
+                                            `}>
+                                                Curriculum
+                                            </span>
+                                        </div>
+                                        <h2 className="text-3xl md:text-4xl font-display font-bold text-white flex items-center gap-5">
+                                            Modules
+                                            <span className="text-slate-700">
+                                                <Layout className="w-8 h-8" />
+                                            </span>
+                                        </h2>
+                                    </div>
+
+                                    {/* Components List */}
+                                    <div className="p-8 flex-1">
+                                        <div className="flex items-center justify-between mb-8">
+                                            <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Available Courses</h3>
+                                            <div className="h-px flex-1 bg-slate-800/50 ml-6"></div>
+                                        </div>
+                                        
+                                        <div className="space-y-6">
+                                            {activeTier.courses.map((course) => {
+                                                const CourseIcon = course.icon;
+                                                return (
+                                                    <div key={course.id} className="group flex flex-col md:flex-row gap-6 p-5 rounded-2xl hover:bg-slate-800/40 transition-all duration-300 border border-transparent hover:border-slate-800">
+                                                        <div className={`
+                                                            flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center font-display font-bold text-lg shadow-xl
+                                                            transition-all duration-300 group-hover:scale-110 group-hover:rotate-3
+                                                            ${activeTier.lightColor} ${activeTier.textColor} border ${activeTier.borderColor}
+                                                        `}>
+                                                            <CourseIcon className="w-6 h-6" />
+                                                        </div>
+                                                        <div className="pt-1 flex-1">
+                                                            <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-2 mb-2">
+                                                                <h4 className="text-lg font-bold text-slate-200 group-hover:text-white transition-colors">
+                                                                    {course.title}
+                                                                </h4>
+                                                                <div className="flex gap-2 flex-wrap">
+                                                                    {course.tags.map(tag => (
+                                                                        <span key={tag} className="text-[9px] uppercase tracking-wider font-bold text-slate-500 bg-slate-800/50 border border-slate-700/50 px-2 py-0.5 rounded">
+                                                                            {tag}
+                                                                        </span>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                            <p className="text-slate-400 leading-relaxed text-sm group-hover:text-slate-300 transition-colors">
+                                                                {course.description}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    {/* Card Footer */}
+                                    <div className="px-8 py-5 bg-slate-900/40 border-t border-slate-800/50 text-[10px] font-bold text-slate-500 flex justify-between items-center backdrop-blur-md">
+                                        <span className="flex items-center gap-2 uppercase tracking-widest">
+                                            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                                            v2.0.0 Masterclass
+                                        </span>
+                                        <div className="flex items-center gap-2 opacity-75 hover:opacity-100 transition-opacity cursor-help uppercase tracking-widest">
+                                            <Info className="w-4 h-4" />
+                                            <span>Enrollment Open</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+
+                    {/* Footer with Attribution & References */}
+                    <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t border-slate-800/50 mt-auto w-full">
+                        <div className="flex flex-col items-center justify-center text-center space-y-6">
+                            
+                            {/* Developer & Group Attribution */}
+                            <div className="space-y-2">
+                                <p className="text-slate-500 text-sm font-medium">
+                                    Developed by <span className="text-slate-200 font-semibold">Ahmad Hidayat</span>
+                                </p>
+                                <p className="text-[10px] uppercase tracking-widest font-bold text-blue-500/80 bg-blue-900/10 px-3 py-1 rounded-full border border-blue-500/10 inline-block">
+                                    Technical Working Group SATUSEHAT
+                                </p>
+                            </div>
+
+                            {/* References */}
+                            <div className="max-w-2xl mx-auto pt-6 border-t border-slate-800/50 w-full">
+                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-4">References</p>
+                                <div className="flex flex-col md:flex-row flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-slate-500">
+                                    <span className="hover:text-slate-300 transition-colors cursor-default">
+                                        Australian Digital Health Capability Framework
+                                    </span>
+                                    <span className="hidden md:inline text-slate-700">•</span>
+                                    <span className="hover:text-slate-300 transition-colors cursor-default">
+                                        Australian Health Informatics Competency Framework for Health Informaticians
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
