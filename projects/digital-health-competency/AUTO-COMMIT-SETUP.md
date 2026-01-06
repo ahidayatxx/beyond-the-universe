@@ -35,14 +35,14 @@ Location: `digital-health-competency/auto-commit.sh`
 Simply run the auto-commit script from **within** the `digital-health-competency` directory:
 
 ```bash
-cd /Users/ahmadhidayat/claude-code/digital-health-competency
+cd /Users/ahmadhidayat/claude-code/projects/digital-health-competency
 ./auto-commit.sh
 ```
 
 Or use the full path from anywhere:
 
 ```bash
-/Users/ahmadhidayat/claude-code/digital-health-competency/auto-commit.sh
+/Users/ahmadhidayat/claude-code/projects/digital-health-competency/auto-commit.sh
 ```
 
 ### What Happens Automatically
@@ -64,8 +64,8 @@ Status: ✅ Up to date
 
 ## 🌐 View Your Changes Online
 
-- **GitHub**: https://github.com/ahidayatxx/beyond-the-universe/tree/main/digital-health-competency
-- **Live Site**: https://ahidayatxx.github.io/beyond-the-universe/digital-health-competency/
+- **GitHub**: https://github.com/ahidayatxx/beyond-the-universe/tree/main/projects/digital-health-competency
+- **Live Site**: https://ahidayatxx.github.io/beyond-the-universe/projects/digital-health-competency/
 
 ## 📝 Files in Repository
 
@@ -98,7 +98,7 @@ Currently tracked:
 | Commit changes | `./auto-commit.sh` |
 | Check git status | `git status digital-health-competency/` |
 | View commits | `git log --oneline -5` |
-| View on GitHub | Open: https://github.com/ahidayatxx/beyond-the-universe/tree/main/digital-health-competency |
+| View on GitHub | Open: https://github.com/ahidayatxx/beyond-the-universe/tree/main/projects/digital-health-competency |
 
 ## ✨ All Set!
 

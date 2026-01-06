@@ -4,7 +4,7 @@ A comprehensive web application presenting a 3-tier digital health competency fr
 
 ## 🌐 Live Demo
 
-Visit the site: [https://ahidayatxx.github.io/beyond-the-universe/digital-health-competency/](https://ahidayatxx.github.io/beyond-the-universe/digital-health-competency/)
+Visit the site: [https://ahidayatxx.github.io/beyond-the-universe/projects/digital-health-competency/](https://ahidayatxx.github.io/beyond-the-universe/projects/digital-health-competency/)
 
 ## 📋 Overview
 
@@ -23,7 +23,7 @@ No build process required—simply open any HTML file in a web browser:
 open index.html
 
 # Option 2: Start a local server (Python 3)
-cd digital-health-competency
+cd projects/digital-health-competency
 python3 -m http.server 8000
 # Then visit http://localhost:8000
 ```
@@ -104,5 +104,5 @@ This project is part of the [beyond-the-universe](https://github.com/ahidayatxx/
 
 ## 🔗 Links
 
-- [GitHub Repository](https://github.com/ahidayatxx/beyond-the-universe/tree/main/digital-health-competency)
-- [Live Demo](https://ahidayatxx.github.io/beyond-the-universe/digital-health-competency/)
+- [GitHub Repository](https://github.com/ahidayatxx/beyond-the-universe/tree/main/projects/digital-health-competency)
+- [Live Demo](https://ahidayatxx.github.io/beyond-the-universe/projects/digital-health-competency/)

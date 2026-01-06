@@ -15,20 +15,24 @@ NC='\033[0m' # No Color
 
 # Get the script's directory (digital-health-competency)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Parent is now projects/ directory
 PARENT_DIR="$(dirname "$SCRIPT_DIR")"
+# Git repo is two levels up
+GIT_ROOT="$(dirname "$PARENT_DIR")"
 
 echo -e "${BLUE}🔄 Auto-commit script for digital-health-competency${NC}"
 echo -e "${BLUE}📁 Working directory: ${SCRIPT_DIR}${NC}"
 
-# Change to parent directory (where git repo is)
-cd "$PARENT_DIR"
+# Change to git root directory
+cd "$GIT_ROOT"
 
 echo -e "${BLUE}🔍 Checking for changes...${NC}"
 
 # Check if there are any changes
-if git diff --quiet --exit-code digital-health-competency 2>/dev/null; then
-    # Check for untracked files in digital-health-competency only
-    UNTRACKED=$(git ls-files --others --exclude-standard digital-health-competency)
+TARGET_PATH="projects/digital-health-competency"
+if git diff --quiet --exit-code "$TARGET_PATH" 2>/dev/null; then
+    # Check for untracked files
+    UNTRACKED=$(git ls-files --others --exclude-standard "$TARGET_PATH")
     if [ -z "$UNTRACKED" ]; then
         echo -e "${YELLOW}✓ No changes detected in digital-health-competency${NC}"
         exit 0
@@ -37,16 +41,16 @@ fi
 
 # Show what changed
 echo -e "${BLUE}📋 Changes detected:${NC}"
-git status --short digital-health-competency
+git status --short "$TARGET_PATH"
 
-# Add all changes in digital-health-competency directory
-git add digital-health-competency/
+# Add all changes in the target directory
+git add "$TARGET_PATH/"
 
 # Generate commit message with timestamp
 TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
 COMMIT_MSG="🚀 Auto-update: ${TIMESTAMP}
 
-- Updated files in digital-health-competency/
+- Updated files in projects/digital-health-competency/
 - Auto-generated commit from local development"
 
 # Create commit
@@ -58,4 +62,4 @@ echo -e "${GREEN}⬆️  Pushing to GitHub...${NC}"
 git push beyond-the-universe main
 
 echo -e "${GREEN}✅ Successfully committed and pushed changes!${NC}"
-echo -e "${BLUE}🔗 View at: https://github.com/ahidayatxx/beyond-the-universe/tree/main/digital-health-competency${NC}"
+echo -e "${BLUE}🔗 View at: https://github.com/ahidayatxx/beyond-the-universe/tree/main/projects/digital-health-competency${NC}"

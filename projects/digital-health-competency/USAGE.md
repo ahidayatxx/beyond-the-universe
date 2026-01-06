@@ -66,7 +66,7 @@ The `.gitignore` in the parent directory excludes:
 ### Script not found
 Make sure you're in the `digital-health-competency` directory:
 ```bash
-cd /Users/ahmadhidayat/claude-code/digital-health-competency
+cd /Users/ahmadhidayat/claude-code/projects/digital-health-competency
 ./auto-commit.sh
 ```
 
@@ -88,7 +88,7 @@ git push beyond-the-universe main
 
 When you update files through Claude Code, simply run:
 ```
-Bash: /Users/ahmadhidayat/claude-code/digital-health-competency/auto-commit.sh
+Bash: /Users/ahmadhidayat/claude-code/projects/digital-health-competency/auto-commit.sh
 ```
 
 This will automatically commit and push your changes!
