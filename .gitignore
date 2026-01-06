@@ -127,8 +127,14 @@ synthea-with-dependencies.jar
 
 # Auto-commit scripts (local development tools)
 projects/digital-health-competency/watch-and-commit.sh
+projects/digital-health-competency/auto-commit.sh
 
 # Digital Health Competency - Local HTML files (keep only index.html, v2, and framework in GitHub)
 projects/digital-health-competency/digital-health-cb-masterclass.html
 projects/digital-health-competency/digital-health-cb-masterclass-v3.html
 projects/digital-health-competency/Digital-Health-Competency-Based-Masterclass-Course.html
+
+# Digital Health Competency - Local development documentation (keep only 3 HTML files and README in GitHub)
+projects/digital-health-competency/AUTO-COMMIT-SETUP.md
+projects/digital-health-competency/FOLDER-MOVE-COMPLETE.md
+projects/digital-health-competency/USAGE.md
