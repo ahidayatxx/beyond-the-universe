@@ -1,0 +1,293 @@
+# Medical Specialties and Evidence Search Year Ranges
+# This file defines recommended search year ranges based on medical specialty
+# and topic characteristics
+
+# Rapidly Evolving Fields (3-5 years)
+# These specialties have frequent practice-changing updates
+rapidly_evolving:
+  name: "Rapidly Evolving Fields"
+  default_years: 3
+  max_years: 5
+  specialties:
+    - oncology
+    - hematology
+    - infectious diseases
+    - hiv
+    - hepatitis
+    - genetics
+    - genomics
+    - immunology
+    - rheumatology
+    - neuroimmunology
+  keywords:
+    - immunotherapy
+    - targeted therapy
+    - CAR-T
+    - checkpoint inhibitors
+    - antiviral
+    - gene therapy
+    - precision medicine
+    - personalized medicine
+    - monoclonal antibody
+
+# Moderately Evolving Fields (5-7 years)
+# These specialties have steady but not revolutionary changes
+moderately_evolving:
+  name: "Moderately Evolving Fields"
+  default_years: 5
+  max_years: 7
+  specialties:
+    - cardiology
+    - neurology
+    - pulmonology
+    - critical care
+    - gastroenterology
+    - endocrinology
+    - nephrology
+    - hepatology
+  keywords:
+    - heart failure
+    - coronary artery disease
+    - stroke
+    - copd
+    - asthma
+    - diabetes
+    - chronic kidney disease
+    - cirrhosis
+    - arrhythmia
+
+# Established Treatments (7-10 years)
+# These fields have well-established standards with gradual updates
+established_treatments:
+  name: "Established Treatment Fields"
+  default_years: 7
+  max_years: 10
+  specialties:
+    - internal medicine
+    - family medicine
+    - primary care
+    - general medicine
+    - pediatrics
+    - obstetrics
+    - gynecology
+  keywords:
+    - hypertension
+    - hyperlipidemia
+    - depression
+    - anxiety
+    - prenatal care
+    - contraception
+    - vaccination
+    - preventive care
+
+# Surgical & Procedural (5-10 years)
+# Surgical techniques evolve, but core principles remain stable
+surgical:
+  name: "Surgical & Procedural Fields"
+  default_years: 5
+  max_years: 10
+  specialties:
+    - surgery
+    - orthopedics
+    - urology
+    - otolaryngology
+    - ophthalmology
+    - plastic surgery
+    - neurosurgery
+    - cardiac surgery
+    - vascular surgery
+  keywords:
+    - surgical technique
+    - minimally invasive
+    - laparoscopic
+    - robotic
+    - arthroscopy
+    - endoscopic
+    - procedure
+    - implant
+
+# Emergency & Acute Care (3-5 years)
+# Emergency protocols update frequently based on new evidence
+emergency:
+  name: "Emergency & Acute Care"
+  default_years: 3
+  max_years: 5
+  specialties:
+    - emergency medicine
+    - trauma
+    - toxicology
+  keywords:
+    - resuscitation
+    - acls
+    - emergency protocol
+    - trauma care
+    - overdose
+    - poisoning
+
+# Mental Health (7-10 years)
+# Psychiatric treatments have longer validation cycles
+mental_health:
+  name: "Mental Health"
+  default_years: 7
+  max_years: 10
+  specialties:
+    - psychiatry
+    - psychology
+    - addiction medicine
+  keywords:
+    - depression
+    - anxiety
+    - bipolar
+    - schizophrenia
+    - psychotherapy
+    - antidepressant
+    - antipsychotic
+
+# Diagnostic & Imaging (3-5 years)
+# Imaging technology and diagnostic criteria update rapidly
+diagnostic:
+  name: "Diagnostic & Imaging"
+  default_years: 3
+  max_years: 5
+  specialties:
+    - radiology
+    - pathology
+    - laboratory medicine
+    - nuclear medicine
+  keywords:
+    - mri
+    - ct scan
+    - ultrasound
+    - pet scan
+    - biomarker
+    - diagnostic criteria
+    - imaging
+    - molecular testing
+
+# Physical Medicine & Rehabilitation (5-7 years)
+rehab:
+  name: "Physical Medicine & Rehabilitation"
+  default_years: 5
+  max_years: 7
+  specialties:
+    - physical medicine
+    - rehabilitation
+    - sports medicine
+  keywords:
+    - physical therapy
+    - occupational therapy
+    - rehabilitation
+    - exercise therapy
+    - recovery
+
+# Palliative & Hospice (5-7 years)
+# Symptom management research evolves moderately
+palliative:
+  name: "Palliative & Hospice Care"
+  default_years: 5
+  max_years: 7
+  specialties:
+    - palliative care
+    - hospice
+    - end of life care
+  keywords:
+    - pain management
+    - symptom control
+    - end of life
+    - palliative
+    - hospice
+
+# Special Situations
+special_situations:
+  # Rare diseases: search wider as evidence is limited
+  rare_diseases:
+    years: 15
+    keywords:
+      - rare disease
+      - orphan disease
+      - "incidence < 1/1000"
+      - "prevalence < 5/10000"
+
+  # Pediatric: often need longer range due to fewer studies
+  pediatric:
+    years: 10
+    keywords:
+      - pediatric
+      - children
+      - infant
+      - neonatal
+      - adolescent
+
+  # Geriatric: longer range as evidence accumulates slowly
+  geriatric:
+    years: 10
+    keywords:
+      - elderly
+      - geriatric
+      - older adults
+      - nursing home
+      - "age > 65"
+
+  # Pregnancy: safety data requires longer timeframes
+  pregnancy:
+    years: 15
+    keywords:
+      - pregnancy
+      - pregnant
+      - prenatal
+      - lactation
+      - breastfeeding
+      - teratogenic
+
+  # COVID-19 and pandemic topics: very recent evidence only
+  pandemic:
+    years: 3
+    keywords:
+      - covid-19
+      - sars-cov-2
+      - coronavirus
+      - pandemic
+      - epidemic
+
+# Default fallback
+default:
+  years: 7  # When specialty cannot be determined
+
+
+# Usage Guidelines
+
+# 1. **Match Specialty**: Identify the primary specialty relevant to the clinical question
+# 2. **Check Keywords**: Look for keywords that might override the specialty classification
+# 3. **Check Special Situations**: Evaluate if any special situations apply
+# 4. **Apply Default**: If no match found, use default 7-year range
+# 5. **User Override**: Always allow user to modify the year range
+
+# Decision Logic
+
+# 1. If special situation keywords detected → use special situation years
+# 2. Else if specialty matches rapidly evolving → use 3-5 years
+# 3. Else if specialty matches moderately evolving → use 5-7 years
+# 4. Else if specialty matches established treatments → use 7-10 years
+# 5. Else → use default 7 years
+
+# Examples
+
+# Question: "Immunotherapy for metastatic non-small cell lung cancer"
+# → Specialty: Oncology (rapidly_evolving)
+# → Years: 3
+
+# Question: "Beta-blockers for heart failure"
+# → Specialty: Cardiology (moderately_evolving)
+# → Years: 5
+
+# Question: "Antibiotics for acute otitis media in children"
+# → Specialty: Pediatrics + Infectious Diseases
+# → Years: 10 (pediatric overrides due to special situation)
+
+# Question: "Surgical management of rotator cuff tear"
+# → Specialty: Orthopedics (surgical)
+# → Years: 7
+
+# Question: "COVID-19 treatment guidelines"
+# → Special situation: pandemic
+# → Years: 3
